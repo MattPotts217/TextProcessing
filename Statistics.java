@@ -10,6 +10,7 @@ information that will be used to deduce whether an email is spam or not
 public class Statistics {
     private Map<String, Integer> wordCount;
     private Map<String, Integer> spamWords;
+    private Map<String, Integer> hamWords;
     private Map<String, Double> wordWeights;
     private int avgWords;
     private int avgSentences;
@@ -26,10 +27,11 @@ public class Statistics {
         numSentences = 0;
         avgCharacters = 0;
         wordWeights = new HashMap<String, Double>();
+        hamWords = new HashMap<String, Integer>();
     }
 
     /*
-    Adds an email to the set list of a Statistics Class
+    Adds an email to the set list of a Statistics Class, then updates all statistics
     Created by Matt Potts, Nov. 17, 2024
      */
     public void addEmail(Email e) {
@@ -39,6 +41,8 @@ public class Statistics {
             wordCount.put(contents[i], wordCount.getOrDefault(contents[i], 0) + 1);
             if(e.isSpam())
                 spamWords.put(contents[i], spamWords.getOrDefault(contents[i], 0) + 1);
+            else
+                hamWords.put(contents[i], hamWords.getOrDefault(contents[i], 0) + 1);
             if(contents[i].contains("."))
                 numSentences++;
         }
@@ -46,11 +50,10 @@ public class Statistics {
         calculateAverageWords();
         calculateAverageSentences();
         calculateWordWeights();
-        e.calculateWeight(this);
     }
 
     /*
-    Calculates the average number of words across all emails
+    Calculates the average number of words across all emails by taking the count of all words, then dividing by the number of total emails
     Created by Matt Potts, Nov. 17, 2024
      */
     private void calculateAverageWords() {
@@ -63,6 +66,7 @@ public class Statistics {
 
     /*
     Calculates the weight of all words in wordCount against spamWords, if it exists in spamWords
+    @TODO introduce hamWords count
     Created by Matt Potts, Nov. 17, 2024
      */
     private void calculateWordWeights() {
@@ -74,6 +78,11 @@ public class Statistics {
         }
     }
 
+    /*
+    Calculate the average number of characters by taking the total characters across all emails then dividing by total emails
+    @TODO I'm not sure if this does what it is supposed to do, will look into
+    Created by Matt Potts, Nov. 17, 2024
+     */
     private void calulateAverageCharacters() {
         int sum = 0;
         for(Map.Entry<String, Integer> entry : wordCount.entrySet()) {
@@ -82,9 +91,14 @@ public class Statistics {
         avgCharacters = sum / numMail;
     }
 
+    /*
+    Returns the weight of a given word
+    Created by Matt Potts, Nov. 17, 2024
+     */
     public Double getWordWeight(String word) {
         return wordWeights.get(word);
     }
+
     /*
     Calculates the average number of sentences
     Created by Matt Potts, Nov. 17, 2024
@@ -93,26 +107,56 @@ public class Statistics {
         avgSentences = numSentences / numMail;
     }
 
+    /*
+    returns total average number of words
+    Created by Matt Potts Nov. 17, 2024
+     */
     public int getAvgWords() {
         return avgWords;
     }
 
+    /*
+   returns the average number of sentences
+   Created by Matt Potts, Nov. 17, 2024
+     */
     public int getAvgSentences() {
         return avgSentences;
     }
 
+    /*
+    Returns the map for the count of all words
+    Created by Matt Potts, Nov. 17, 2024
+     */
     public Map<String, Integer> getWordCount() {
         return wordCount;
     }
-
+    /*
+    returns the map for the count of the spam words
+    Created by Matt Potts, Nov. 17, 2024
+     */
     public Map<String, Integer> getSpamWords() {
         return spamWords;
     }
 
+    /*
+    returns the map for the weight of the words
+    Created by Matt Potts, Nov. 17, 2024
+     */
     public Map<String, Double> getWordWeights() {
         return wordWeights;
     }
 
+    /*
+    returns the map for all of the words in the not spam map
+    Created by Matt Potts, Nov. 18, 2024
+     */
+    public Map<String, Integer> getHamWords() {
+        return hamWords;
+    }
+    /*
+    returns the average number of characters, calculated by the length of all the emails divided by all emails
+    Created by Matt Potts, Nov 17, 2024
+     */
     public int getAvgCharacters() {
         return avgCharacters;
     }
