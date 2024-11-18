@@ -21,9 +21,11 @@ public class test {
         for(Email email : emails) {
             email.calculateWeight(s);
         }
-        Map<String, Double> spamWords = s.getWordWeights();
+        Map<String, Double> spamWords = s.getSpamWordWeights();
+        Map<String, Double> notSpamWords = s.getHamWordWeights();
         System.out.println(spamWords);
-        System.out.println(s.getAvgWords());
+        System.out.println(notSpamWords);
+        System.out.println(emails.get(120).getWeight());
     }
 
     public static void createDataSet(Scanner sc) {

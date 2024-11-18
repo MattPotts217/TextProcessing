@@ -5,7 +5,6 @@ public class Email {
     private int numChars;
     private double weight;
 
-
     /*
     Constructor for an empty Email with no parameters
     Created by Matt Potts, Nov 17, 2024
@@ -49,15 +48,25 @@ public class Email {
     @TODO: this does not work properly
      */
     public void calculateWeight(Statistics s) {
-        double wordWeight = 0.0;
+
+        double spamWeight = 1.0;
         String[] content = contents.split(" ");
-        for(String entry: content) {
-            if (s.getSpamWords().containsKey(entry))
-                wordWeight += s.getWordWeight(entry);
+        for(String entry : content) {
+            if(s.getSpamWordWeights().containsKey(entry))
+                if (s.getSpamWordWeights().get(entry) > 0)
+                    spamWeight *= s.getSpamWordWeights().get(entry);
         }
-        wordWeight = wordWeight * s.getAvgWords();
-        wordWeight = wordWeight + this.length * s.getAvgCharacters();
-        this.weight = wordWeight / this.numChars;
+
+        double hamWeight = 1.0;
+        for(String entry : content) {
+            if(s.getHamWordWeights().containsKey(entry))
+                if (s.getHamWordWeights().get(entry)  > 0)
+                    hamWeight *= s.getHamWordWeights().get(entry);
+        }
+        if(hamWeight > spamWeight)
+            weight = hamWeight;
+        else
+            weight = spamWeight;
     }
 
     /*

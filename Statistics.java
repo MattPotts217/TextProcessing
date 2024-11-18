@@ -11,28 +11,25 @@ public class Statistics {
     private Map<String, Integer> wordCount;
     private Map<String, Integer> spamWords;
     private Map<String, Integer> hamWords;
-    private Map<String, Double> wordWeights;
-    private int avgWords;
-    private int avgSentences;
-    private int numSentences;
-    private int avgCharacters;
+    private Map<String, Double> spamWordWeights;
+    private Map<String, Double> hamWordWeights;
     private int numMail;
+    private double probability;
 
     public Statistics() {
         wordCount = new HashMap<String, Integer>();
         spamWords = new HashMap<String, Integer>();
-        avgWords = 0;
-        avgSentences = 0;
         numMail = 0;
-        numSentences = 0;
-        avgCharacters = 0;
-        wordWeights = new HashMap<String, Double>();
+        spamWordWeights = new HashMap<String, Double>();
         hamWords = new HashMap<String, Integer>();
+        hamWordWeights = new HashMap<>();
+        probability = 0.0;
     }
 
     /*
     Adds an email to the set list of a Statistics Class, then updates all statistics
     Created by Matt Potts, Nov. 17, 2024
+    Edited by Matt Potts, Nov 18, 2024
      */
     public void addEmail(Email e) {
         String[] contents = e.getContents().split(" ");
@@ -43,85 +40,37 @@ public class Statistics {
                 spamWords.put(contents[i], spamWords.getOrDefault(contents[i], 0) + 1);
             else
                 hamWords.put(contents[i], hamWords.getOrDefault(contents[i], 0) + 1);
-            if(contents[i].contains("."))
-                numSentences++;
         }
-        calulateAverageCharacters();
-        calculateAverageWords();
-        calculateAverageSentences();
         calculateWordWeights();
     }
 
-    /*
-    Calculates the average number of words across all emails by taking the count of all words, then dividing by the number of total emails
-    Created by Matt Potts, Nov. 17, 2024
-     */
-    private void calculateAverageWords() {
-        int sum = 0;
-        for(Map.Entry<String, Integer> entry : wordCount.entrySet()) {
-            sum += entry.getValue();
-        }
-        avgWords = sum / numMail;
-    }
 
     /*
     Calculates the weight of all words in wordCount against spamWords, if it exists in spamWords
-    @TODO introduce hamWords count
     Created by Matt Potts, Nov. 17, 2024
+    Edited by Matt Potts, Nov 18, 2024
+    @TODO this does not calculate correctly
      */
     private void calculateWordWeights() {
-        for(Map.Entry<String, Integer> entry : wordCount.entrySet()) {
-            if(spamWords.containsKey(entry.getKey())) {
-                double weight = (double) spamWords.get(entry.getKey()) / wordCount.get(entry.getKey());
-                wordWeights.put(entry.getKey(), weight);
-            }
+        for(Map.Entry<String, Integer> entry : spamWords.entrySet()) {
+            double weight = (double) spamWords.get(entry.getKey()) / wordCount.size();
+            spamWordWeights.put(entry.getKey(), weight);
+        }
+        for(Map.Entry<String, Integer> entry : hamWords.entrySet()) {
+            double weight = (double) hamWords.get(entry.getKey()) / wordCount.size();
+            hamWordWeights.put(entry.getKey(), weight);
         }
     }
 
+
     /*
-    Calculate the average number of characters by taking the total characters across all emails then dividing by total emails
-    @TODO I'm not sure if this does what it is supposed to do, will look into
+    Returns the weight of a given spam word
     Created by Matt Potts, Nov. 17, 2024
      */
-    private void calulateAverageCharacters() {
-        int sum = 0;
-        for(Map.Entry<String, Integer> entry : wordCount.entrySet()) {
-            sum += entry.getValue();
-        }
-        avgCharacters = sum / numMail;
+    public Double getSpamWordWeight(String word) {
+        return spamWordWeights.get(word);
     }
 
-    /*
-    Returns the weight of a given word
-    Created by Matt Potts, Nov. 17, 2024
-     */
-    public Double getWordWeight(String word) {
-        return wordWeights.get(word);
-    }
-
-    /*
-    Calculates the average number of sentences
-    Created by Matt Potts, Nov. 17, 2024
-     */
-    private void calculateAverageSentences() {
-        avgSentences = numSentences / numMail;
-    }
-
-    /*
-    returns total average number of words
-    Created by Matt Potts Nov. 17, 2024
-     */
-    public int getAvgWords() {
-        return avgWords;
-    }
-
-    /*
-   returns the average number of sentences
-   Created by Matt Potts, Nov. 17, 2024
-     */
-    public int getAvgSentences() {
-        return avgSentences;
-    }
 
     /*
     Returns the map for the count of all words
@@ -142,8 +91,8 @@ public class Statistics {
     returns the map for the weight of the words
     Created by Matt Potts, Nov. 17, 2024
      */
-    public Map<String, Double> getWordWeights() {
-        return wordWeights;
+    public Map<String, Double> getSpamWordWeights() {
+        return spamWordWeights;
     }
 
     /*
@@ -154,10 +103,10 @@ public class Statistics {
         return hamWords;
     }
     /*
-    returns the average number of characters, calculated by the length of all the emails divided by all emails
-    Created by Matt Potts, Nov 17, 2024
+    returns the map of the weights for hamWords
+    Created by Matt Potts, Nov. 18, 2024
      */
-    public int getAvgCharacters() {
-        return avgCharacters;
+    public Map<String, Double> getHamWordWeights() {
+        return hamWordWeights;
     }
 }
