@@ -8,40 +8,47 @@ information that will be used to deduce whether an email is spam or not
 
  */
 public class Statistics {
-    private Map<String, Integer> wordCount;
-    private Map<String, Integer> spamWords;
-    private Map<String, Integer> hamWords;
-    private Map<String, Double> spamWordWeights;
-    private Map<String, Double> hamWordWeights;
-    private int numMail;
-    private double probability;
+    private Map<String, Integer> wordCount, spamWords, hamWords;
+    private Map<String, Double> spamWordWeights, hamWordWeights;
+    private int numMail, numSpam, numHam;
+    private int spamWordsCount, hamWordsCount;
+    private double spamWeight, hamWeight;
 
     public Statistics() {
         wordCount = new HashMap<String, Integer>();
         spamWords = new HashMap<String, Integer>();
-        numMail = 0;
         spamWordWeights = new HashMap<String, Double>();
         hamWords = new HashMap<String, Integer>();
         hamWordWeights = new HashMap<>();
-        probability = 0.0;
+        numMail = 0; numHam = 0; numSpam = 0;
+        spamWeight = 0; hamWeight = 0;
+        spamWordsCount = 0; hamWordsCount = 0;
     }
 
     /*
     Adds an email to the set list of a Statistics Class, then updates all statistics
     Created by Matt Potts, Nov. 17, 2024
     Edited by Matt Potts, Nov 18, 2024
+    Edited by Matt Potts, Nov 19, 2024: Added counts for numbers of spam emails or not spam emails
      */
     public void addEmail(Email e) {
         String[] contents = e.getContents().split(" ");
         numMail++;
+        if(e.isSpam())
+            numSpam++;
+        else
+            numHam++;
         for(int i = 0; i < contents.length; i++) {
             wordCount.put(contents[i], wordCount.getOrDefault(contents[i], 0) + 1);
-            if(e.isSpam())
+            if(e.isSpam()) {
+                spamWordsCount++;
                 spamWords.put(contents[i], spamWords.getOrDefault(contents[i], 0) + 1);
-            else
+            }
+            else {
+                hamWordsCount++;
                 hamWords.put(contents[i], hamWords.getOrDefault(contents[i], 0) + 1);
+            }
         }
-        calculateWordWeights();
     }
 
 
@@ -49,17 +56,19 @@ public class Statistics {
     Calculates the weight of all words in wordCount against spamWords, if it exists in spamWords
     Created by Matt Potts, Nov. 17, 2024
     Edited by Matt Potts, Nov 18, 2024
-    @TODO this does not calculate correctly
+    Edited by Matt Potts, Nov 19, 2024: I believe this works properly now, does not complete implement Naive Bayes
      */
-    private void calculateWordWeights() {
+    public void calculateWordWeights() {
         for(Map.Entry<String, Integer> entry : spamWords.entrySet()) {
-            double weight = (double) spamWords.get(entry.getKey()) / wordCount.size();
+            double weight = (double) (entry.getValue() + 1) / spamWords.size();
             spamWordWeights.put(entry.getKey(), weight);
         }
         for(Map.Entry<String, Integer> entry : hamWords.entrySet()) {
-            double weight = (double) hamWords.get(entry.getKey()) / wordCount.size();
+            double weight = (double) (entry.getValue() + 1) / hamWords.size();
             hamWordWeights.put(entry.getKey(), weight);
         }
+        spamWeight = (double) numSpam / numMail;
+        hamWeight = (double) numHam / numMail;
     }
 
 
@@ -108,5 +117,56 @@ public class Statistics {
      */
     public Map<String, Double> getHamWordWeights() {
         return hamWordWeights;
+    }
+    /*
+    returns the total number of Mail that the statistics class has received
+    Created by Matt Potts, Nov. 19, 2024
+     */
+    public int getNumMail() {
+        return numMail;
+    }
+    /*
+    returns the total number of spam mail the statistics class has received
+    Created by Matt Potts, Nov. 19, 2024
+     */
+    public int getNumSpam() {
+        return numSpam;
+    }
+    /*
+    returns the total number of spam mail that the statistics class has received
+    Created by Matt Potts, Nov. 19, 2024
+     */
+    public int getNumHam() {
+        return numHam;
+    }
+    /*
+    returns the total number of spam words that the statistics class has received
+    Created by Matt Potts, Nov 19. 2024
+     */
+    public int getSpamWordsCount() {
+        return spamWordsCount;
+    }
+    /*
+    returns the total number of ham words that the statistics class has received
+    Created by Matt Potts, Nov 19. 2024
+     */
+    public int getHamWordsCount() {
+        return hamWordsCount;
+    }
+    /*
+    returns the weight/probability that an email is spam based on the total number of spam emails
+    received by the statistics class divided by the total number of emails received
+    Created by Matt Potts, Nov. 19, 2024
+     */
+    public double getSpamWeight() {
+        return spamWeight;
+    }
+    /*
+    returns the weight/probability that an email is not spam based on the total number of spam emails
+    received by the statistics class divided by the total number of emails received
+    Created by Matt Potts, Nov 19. 2024
+     */
+    public double getHamWeight() {
+        return hamWeight;
     }
 }

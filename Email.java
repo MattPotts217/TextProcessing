@@ -45,32 +45,34 @@ public class Email {
     /*
     Calculates the weight of the Email, takes a Statistics class as a parameter to help weigh it
     Created by Matt Potts, Nov 17, 2024
-    @TODO: this does not work properly
+    Edited by Matt Potts, Nov. 19, 2024: I think this works properly now?
      */
     public void calculateWeight(Statistics s) {
-
-        double spamWeight = 1.0;
+        double spamWeight = Math.log(s.getSpamWeight());
+        double hamWeight = Math.log(s.getHamWeight());
         String[] content = contents.split(" ");
         for(String entry : content) {
-            if(s.getSpamWordWeights().containsKey(entry))
-                if (s.getSpamWordWeights().get(entry) > 0)
-                    spamWeight *= s.getSpamWordWeights().get(entry);
+            spamWeight += Math.log(s.getSpamWordWeights().getOrDefault(entry, 1.0 / (s.getSpamWordWeights().size() + 1)));
+            hamWeight += Math.log(s.getHamWordWeights().getOrDefault(entry, 1.0 / (s.getHamWordWeights().size() + 1)));
         }
+        double maxWeight = Math.max(spamWeight, hamWeight);
+        double logDenominator = Math.log(Math.exp(spamWeight - maxWeight) + Math.exp(hamWeight - maxWeight)) + maxWeight;
+        double spamProbability = Math.exp(spamWeight - logDenominator);
+        double hamProbability = Math.exp(hamWeight - logDenominator);
+        if(spamProbability < 1e-10)
+            spamProbability = 0;
+        if(hamProbability < 1e-10)
+            hamProbability = 0;
 
-        double hamWeight = 1.0;
-        for(String entry : content) {
-            if(s.getHamWordWeights().containsKey(entry))
-                if (s.getHamWordWeights().get(entry)  > 0)
-                    hamWeight *= s.getHamWordWeights().get(entry);
-        }
-        if(hamWeight > spamWeight)
-            weight = hamWeight;
+        System.out.println(spamProbability + " | " + hamProbability);
+        if(spamProbability > hamProbability)
+            weight = spamProbability;
         else
-            weight = spamWeight;
+            weight = hamProbability;
     }
 
     /*
-    returns the contents of an email as a string
+    returns the contents of an email
     Created by Matt Potts, Nov 17, 2024
      */
     public String getContents() {
@@ -107,5 +109,13 @@ public class Email {
      */
     public double getWeight() {
         return weight;
+    }
+
+    /*
+    returns a String version of an email in the form "Email: " + contents
+    Created by Matt Potts, Nov 19, 2024
+     */
+    public String toString() {
+        return "Email: " + contents;
     }
 }

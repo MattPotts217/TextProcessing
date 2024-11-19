@@ -3,7 +3,9 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Scanner;
-
+/*
+    This class serves as a "sandbox" to test if the everything is working properly
+ */
 public class test {
     static ArrayList<Email> emails = new ArrayList<>();
     static ArrayList<Email> spamMail = new ArrayList<>();
@@ -18,16 +20,16 @@ public class test {
         for (Email email : emails) {
             s.addEmail(email);
         }
+        s.calculateWordWeights();
         for(Email email : emails) {
             email.calculateWeight(s);
         }
-        Map<String, Double> spamWords = s.getSpamWordWeights();
-        Map<String, Double> notSpamWords = s.getHamWordWeights();
-        System.out.println(spamWords);
-        System.out.println(notSpamWords);
-        System.out.println(emails.get(120).getWeight());
+        System.out.println(emails.get(1500).getWeight());
     }
 
+    /*
+    A test method to create a data set based on the training sets
+     */
     public static void createDataSet(Scanner sc) {
         sc.nextLine();
         while (sc.hasNextLine()) {
