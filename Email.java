@@ -59,16 +59,16 @@ public class Email {
         double logDenominator = Math.log(Math.exp(spamWeight - maxWeight) + Math.exp(hamWeight - maxWeight)) + maxWeight;
         double spamProbability = Math.exp(spamWeight - logDenominator);
         double hamProbability = Math.exp(hamWeight - logDenominator);
-        if(spamProbability < 1e-10)
+        if(spamProbability < 1e-5)
             spamProbability = 0;
-        if(hamProbability < 1e-10)
+        if(hamProbability < 1e-5)
             hamProbability = 0;
 
         System.out.println(spamProbability + " | " + hamProbability);
         if(spamProbability > hamProbability)
             weight = spamProbability;
         else
-            weight = hamProbability;
+            weight = 1 - hamProbability;
     }
 
     /*
@@ -94,7 +94,12 @@ public class Email {
     public int getNumChars() {
         return numChars;
     }
-
+    public void changeSpam() {
+        if(weight > .6)
+            spam = 1;
+        else
+            spam = 0;
+    }
     /*
     returns whether an email is marked as spam
     Created by Matt Potts, Nov 17, 2024
