@@ -20,7 +20,7 @@ public class Email {
     Edited by Matt Potts, Nov 18, 2024: fixed the calculation for the number of characters in an email
      */
     public Email(String contents) {
-        this.contents = contents;
+        this.contents = contents.substring(0, contents.length() - 1);
         numChars = contents.length() - 1;
         spam = 0;
         String[] s = contents.split(" ");
@@ -34,7 +34,7 @@ public class Email {
     Edited by Matt Potts, Nov 18, 2024: was missing info for num of chars and length
      */
     public Email(String contents, boolean spam) {
-        this.contents = contents;
+        this.contents = contents.substring(0, contents.length() - 1);
         this.spam = spam ? 1 : 0;
         numChars = contents.length() - 1;
         String[] s = contents.split(" ");
@@ -63,8 +63,6 @@ public class Email {
             spamProbability = 0;
         if(hamProbability < 1e-5)
             hamProbability = 0;
-
-        System.out.println(spamProbability + " | " + hamProbability);
         if(spamProbability > hamProbability)
             weight = spamProbability;
         else
