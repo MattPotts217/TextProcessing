@@ -7,9 +7,7 @@ import java.util.Scanner;
         Created by Matt Potts: Dec. 5, 2024
  */
 public class TestFinal {
-        static ArrayList<Email> trainingEmails = new ArrayList<>();
-//        static ArrayList<Email> trainingSpamMail = new ArrayList<>();
-//        static ArrayList<Email> trainingNotSpam = new ArrayList<>();
+    static ArrayList<Email> trainingEmails = new ArrayList<>();
     static ArrayList<Email> testingEmails = new ArrayList<>();
 
         public static void main(String[] args) throws FileNotFoundException {
@@ -32,6 +30,7 @@ public class TestFinal {
                 else
                     testHam.add(email);
             }
+            //correctness based on what i'm pretty sure is the correct answer from the set
             System.out.println("Spam Emails total: " + testSpam.size() + "\nHam Emails total: " + testHam.size());
             System.out.println("Correct: " + testSpam.size() / 500.0 + "%");
         }
@@ -68,12 +67,6 @@ public class TestFinal {
             for(Email email : trainingEmails) {
                 email.calculateWeight(s);
                 email.changeSpam();
-//                if(email.isSpam()) {
-//                    trainingSpamMail.add(email);
-//                }
-//                else {
-//                    trainingNotSpam.add(email);
-//                }
             }
             sc.close();
         }
